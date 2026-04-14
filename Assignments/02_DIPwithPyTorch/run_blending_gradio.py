@@ -115,15 +115,12 @@ def create_mask_from_points(points, img_h, img_w):
 
     return mask
 def get_bbox_pytorch(mask):
-    # mask 形状假设为 (H, W) 或 (1, 1, H, W)
-    coords = torch.nonzero(mask.squeeze() > 0) # 返回 [N, 维度]
+
+    coords = torch.nonzero(mask.squeeze() > 0) 
     
     if coords.numel() == 0:
         return None
-    
-    # 这里的 indices 顺序是 (y, x)
-    #y_min, x_min = coords.min(dim=0).values
-    #y_max, x_max = coords.max(dim=0).values
+
     y_min, y_max = coords[:, 0].aminmax()
     x_min, x_max = coords[:, 1].aminmax()
     return x_min.item(), y_min.item(), x_max.item(), y_max.item()
