@@ -36,13 +36,14 @@ python train.py
 ```
 ## 4. Results and Metrics
 
-### Training Logs Summary
-| Phase | Epoch | Training L1 Loss | Validation L1 Loss | Visual Characteristics |
-| :--- | :--- | :--- | :--- | :--- |
-| **Initial** | 30 | ~0.37 | ~0.41 | Basic color blocks identified; edges are extremely blurry. |
-| **Mid-term** | 130 | ~0.28 | ~0.40 | Structures are accurate; severe over-smoothing present. |
-| **Final** | 300 | **~0.24** | **~0.40** | Stable color tones; missing high-frequency textures. |
+### Train Results
 <img src="train_results/epoch_295/result_1.png" alt="alt text" width="800">
+<img src="train_results/epoch_295/result_2.png" alt="alt text" width="800">
+
+### Validation Results
+<img src="val_results/epoch_295/result_1.png" alt="alt text" width="800">
+<img src="val_results/epoch_295/result_2.png" alt="alt text" width="800">
+
 ### Visual Results
 As observed in the `./train_results` folder, the model successfully learns the spatial mapping (e.g., placing windows and doors correctly). However, the output images exhibit an "out-of-focus" effect, which is a characteristic limitation of the FCN + L1 Loss combination.
 
