@@ -1,0 +1,15 @@
+{
+  "dense_fused_vertices": 113432,
+  "fused_ply": "data/colmap/dense/fused.ply",
+  "preview": "outputs/colmap/dense_fused_preview.png",
+  "bounds_min": [
+    2.2111196517944336,
+    -2.738706350326538,
+    1.6306501626968384
+  ],
+  "bounds_max": [
+    4.773662567138672,
+    1.8459076881408691,
+    4.368025302886963
+  ]
+}

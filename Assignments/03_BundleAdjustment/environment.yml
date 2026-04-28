@@ -1,0 +1,16 @@
+name: dip2026-ba
+channels:
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      - --index-url https://download.pytorch.org/whl/cu118
+      - --extra-index-url https://pypi.org/simple
+      - numpy>=1.24
+      - matplotlib>=3.7
+      - opencv-python>=4.8
+      - pillow>=10.0
+      - tqdm>=4.66
+      - torch==2.7.1+cu118
+      - torchvision==0.22.1+cu118

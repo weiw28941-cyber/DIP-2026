@@ -1,1 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local environments
+.venv/
+venv/
+env/
+.conda/
+*.egg-info/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Assignment scratch files
 model.py
+
+# COLMAP heavy intermediate files.
+# Keep the sparse model, fused dense cloud, report preview, and summaries tracked.
+Assignments/03_BundleAdjustment/data/colmap/database.db
+Assignments/03_BundleAdjustment/data/colmap/dense/images/
+Assignments/03_BundleAdjustment/data/colmap/dense/sparse/
+Assignments/03_BundleAdjustment/data/colmap/dense/stereo/consistency_graphs/
+Assignments/03_BundleAdjustment/data/colmap/dense/stereo/depth_maps/
+Assignments/03_BundleAdjustment/data/colmap/dense/stereo/normal_maps/
+Assignments/03_BundleAdjustment/data/colmap/dense/stereo/*.cfg
+Assignments/03_BundleAdjustment/data/colmap/dense/fused.ply.vis
+Assignments/03_BundleAdjustment/data/colmap/dense/run-colmap-*.sh
