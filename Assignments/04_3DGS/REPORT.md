@@ -70,13 +70,37 @@ This verifies that the COLMAP loader, Gaussian model, differentiable renderer, o
 
 COLMAP sparse point reprojection result:
 
-![COLMAP sparse point projection](data/chair/projections/r_0.png)
+<p align="center">
+  <img src="data/chair/projections/r_0.png" alt="COLMAP sparse point projection" width="520">
+</p>
 
 One-epoch simplified 3DGS training debug result. The top row shows ground-truth views, and the bottom row shows the corresponding rendered views after epoch 0:
 
-![Simplified 3DGS debug rendering after epoch 0](data/chair/checkpoints/debug_images/epoch_0000.png)
+<p align="center">
+  <img src="data/chair/checkpoints/debug_images/epoch_0000.png" alt="Simplified 3DGS debug rendering after epoch 0" width="420">
+</p>
 
-The generated multi-view debug rendering video is saved at:
+The rendered views are still blurry because this is only a one-epoch sanity-check run at 100 x 100 render resolution. The simplified implementation also keeps a fixed sparse COLMAP Gaussian set and does not use adaptive densification, pruning, or the optimized rasterization strategy from the official 3DGS implementation.
+
+I then continued training to epoch 40 and stopped after the epoch-40 checkpoint was saved:
+
+```bash
+python train.py --colmap_dir data/chair --checkpoint_dir data/chair/final_checkpoints --num_epochs 61 --debug_every 20 --debug_samples 2 --device cuda
+```
+
+Final trained result at epoch 40:
+
+- Final average L1 loss at epoch 40: about 0.0266
+- Checkpoint: `data/chair/final_checkpoints/checkpoint_000040.pt`
+- Debug image: `data/chair/final_checkpoints/debug_images/epoch_0040.png`
+
+<p align="center">
+  <img src="data/chair/final_checkpoints/debug_images/epoch_0040.png" alt="Simplified 3DGS debug rendering after epoch 40" width="420">
+</p>
+
+Compared with the one-epoch sanity-check image, the epoch-40 rendering has sharper chair boundaries and more stable color reconstruction. It is still not as sharp as the official 3DGS result because this implementation does not densify or prune Gaussians and still renders at the downsampled 100 x 100 resolution.
+
+The earlier one-epoch sanity-check multi-view debug rendering video is saved at:
 
 [`data/chair/checkpoints/debug_rendering.mp4`](data/chair/checkpoints/debug_rendering.mp4)
 
