@@ -66,6 +66,20 @@ Result:
 
 This verifies that the COLMAP loader, Gaussian model, differentiable renderer, optimizer, checkpointing, and visualization path all run end to end.
 
+## Result Visualization
+
+COLMAP sparse point reprojection result:
+
+![COLMAP sparse point projection](data/chair/projections/r_0.png)
+
+One-epoch simplified 3DGS training debug result. The top row shows ground-truth views, and the bottom row shows the corresponding rendered views after epoch 0:
+
+![Simplified 3DGS debug rendering after epoch 0](data/chair/checkpoints/debug_images/epoch_0000.png)
+
+The generated multi-view debug rendering video is saved at:
+
+[`data/chair/checkpoints/debug_rendering.mp4`](data/chair/checkpoints/debug_rendering.mp4)
+
 ## Task 3: Comparison With Official 3DGS
 
 This simplified PyTorch implementation is intentionally much less optimized than the official 3DGS implementation.
