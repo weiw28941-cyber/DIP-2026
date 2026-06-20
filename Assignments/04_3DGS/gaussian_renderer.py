@@ -38,20 +38,26 @@ class GaussianRenderer(nn.Module):
         
         # 2. Get depths before projection for proper sorting and clipping
         depths = cam_points[:, 2].clamp(min=1.)  # (N, )
+        z = depths.clamp(min=1e-6)
         
         # 3. Project to screen space using camera intrinsics
         screen_points = cam_points @ K.T  # (N, 3)
-        means2D = screen_points[..., :2] / screen_points[..., 2:3] # (N, 2)
+        means2D = screen_points[..., :2] / z[:, None] # (N, 2)
         
         # 4. Transform covariance to camera space and then to 2D
         # Compute Jacobian of perspective projection
         J_proj = torch.zeros((N, 2, 3), device=means3D.device)
-        ### FILL:
-        ### J_proj = ...
+        fx, fy = K[0, 0], K[1, 1]
+        x_cam, y_cam = cam_points[:, 0], cam_points[:, 1]
+        J_proj[:, 0, 0] = fx / z
+        J_proj[:, 0, 2] = -fx * x_cam / (z * z)
+        J_proj[:, 1, 1] = fy / z
+        J_proj[:, 1, 2] = -fy * y_cam / (z * z)
         
         # Transform covariance to camera space
-        ### FILL: Aplly world to camera rotation to the 3d covariance matrix
-        ### covs_cam = ...  # (N, 3, 3)
+        # Apply world to camera rotation to the 3d covariance matrix
+        R_expand = R.unsqueeze(0).expand(N, -1, -1)
+        covs_cam = torch.bmm(R_expand, torch.bmm(covs3d, R_expand.transpose(1, 2)))  # (N, 3, 3)
         
         # Project to 2D
         covs2D = torch.bmm(J_proj, torch.bmm(covs_cam, J_proj.permute(0, 2, 1)))  # (N, 2, 2)
@@ -75,8 +81,11 @@ class GaussianRenderer(nn.Module):
         covs2D = covs2D + eps * torch.eye(2, device=covs2D.device).unsqueeze(0)
         
         # Compute determinant for normalization
-        ### FILL: compute the gaussian values
-        ### gaussian = ... ## (N, H, W)
+        det = torch.linalg.det(covs2D).clamp(min=eps)
+        inv_covs = torch.linalg.inv(covs2D)
+        exponent = -0.5 * torch.einsum('nhwi,nij,nhwj->nhw', dx, inv_covs, dx)
+        norm = 1.0 / (2.0 * np.pi * torch.sqrt(det))
+        gaussian = norm.view(N, 1, 1) * torch.exp(exponent) ## (N, H, W)
     
         return gaussian
 
@@ -114,14 +123,16 @@ class GaussianRenderer(nn.Module):
         
         # 6. Alpha composition setup
         alphas = opacities.view(N, 1, 1) * gaussian_values  # (N, H, W)
-        colors = colors.view(N, 3, 1, 1).expand(-1, -1, self.H, self.W)  # (N, 3, H, W)
-        colors = colors.permute(0, 2, 3, 1)  # (N, H, W, 3)
         
         # 7. Compute weights
-        ### FILL:
-        ### weights = ... # (N, H, W)
+        alphas = alphas.clamp(0.0, 0.999)
+        transmittance = torch.cumprod(
+            torch.cat([torch.ones_like(alphas[:1]), 1.0 - alphas[:-1]], dim=0),
+            dim=0
+        )
+        weights = alphas * transmittance # (N, H, W)
         
         # 8. Final rendering
-        rendered = (weights.unsqueeze(-1) * colors).sum(dim=0)  # (H, W, 3)
+        rendered = torch.einsum('nhw,nc->hwc', weights, colors)  # (H, W, 3)
         
         return rendered

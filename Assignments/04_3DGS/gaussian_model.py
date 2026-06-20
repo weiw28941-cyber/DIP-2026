@@ -3,9 +3,16 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from pytorch3d.ops.knn import knn_points
 from typing import Dict, Tuple
 from dataclasses import dataclass
+
+try:
+    from pytorch3d.ops.knn import knn_points
+except ImportError:
+    def knn_points(points1, points2, K):
+        dists = torch.cdist(points1, points2).pow(2)
+        knn_dists, knn_idx = torch.topk(dists, k=K, dim=-1, largest=False)
+        return knn_dists, knn_idx, None
 
 
 @dataclass
@@ -110,8 +117,8 @@ class GaussianModel(nn.Module):
         S = torch.diag_embed(scales)
         
         # Compute covariance
-        ### FILL:
-        ### Covs3d = ...
+        L = torch.bmm(R, S)
+        Covs3d = torch.bmm(L, L.transpose(1, 2))
         
         return Covs3d
 

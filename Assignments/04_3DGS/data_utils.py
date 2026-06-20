@@ -3,8 +3,23 @@ import cv2
 import os
 import torch
 from torch.utils.data import Dataset
-from pytorch3d.ops import sample_farthest_points
-from natsort import natsorted
+import re
+
+try:
+    from pytorch3d.ops import sample_farthest_points
+except ImportError:
+    def sample_farthest_points(points, K):
+        K = min(K, points.shape[1])
+        return points[:, :K], torch.arange(K, device=points.device).unsqueeze(0)
+
+try:
+    from natsort import natsorted
+except ImportError:
+    def natsorted(items, key=None):
+        def natural_key(item):
+            value = key(item) if key else item
+            return [int(part) if part.isdigit() else part for part in re.split(r'(\d+)', str(value))]
+        return sorted(items, key=natural_key)
 
 def qvec2rotmat(qvec):
     """Convert quaternion to rotation matrix"""
